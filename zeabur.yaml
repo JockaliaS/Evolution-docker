@@ -1,0 +1,158 @@
+# yaml-language-server: $schema=https://schema.zeabur.app/template.json
+apiVersion: zeabur.com/v1
+kind: Template
+metadata:
+    name: evolution-api
+spec:
+    description: Evolution API is a powerful WhatsApp API that allows you to connect and manage your WhatsApp accounts programmatically.
+    icon: https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1735656025985x589899456761148800%2Fevolution-logo.png
+    tags:
+        - API
+        - WhatsApp
+        - Communication
+    readme: |
+        # Evolution API
+
+        This template deploys Evolution API, a powerful WhatsApp API that allows you to connect and manage your WhatsApp accounts programmatically.
+
+        ## Components
+
+        - **Evolution API**: The main API service
+        - **PostgreSQL**: Database for storing messages and instance data
+        - **Redis**: Cache server for improved performance
+
+        ## Configuration
+
+        ### Environment Variables
+
+        Key environment variables:
+
+        - **SERVER_URL**: The public URL of your application (automatically set to your Zeabur domain)
+        - **AUTHENTICATION_API_KEY**: API key for accessing the Evolution API (automatically generated)
+        - **DATABASE_CONNECTION_URI**: Database connection string (automatically configured)
+
+        ### Getting Started
+
+        1. After deployment, access your Evolution API at the provided URL
+        2. Use the generated API key for authentication
+        3. Create instances and connect them to WhatsApp using the API
+
+        ### API Documentation
+
+        For detailed API documentation, visit [Evolution API Documentation](https://doc.evolution-api.com)
+
+        ## Security Notes
+
+        - Keep your API key secure
+        - Configure webhooks for receiving real-time updates
+        - Set appropriate permissions for your instances
+    services:
+        - name: postgres
+          icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
+          template: PREBUILT
+          spec:
+            source:
+                image: postgres:15
+            ports:
+                - id: postgres
+                  port: 5432
+                  type: TCP
+            volumes:
+                - id: data
+                  dir: /var/lib/postgresql/data
+            env:
+                POSTGRES_DB:
+                    default: evolution
+                POSTGRES_HOST_AUTH_METHOD:
+                    default: trust
+                POSTGRES_PASSWORD:
+                    default: ${PASSWORD}
+                POSTGRES_USER:
+                    default: user
+        - name: redis
+          icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/redis.svg
+          template: PREBUILT
+          spec:
+            source:
+                image: redis:latest
+            ports:
+                - id: redis
+                  port: 6379
+                  type: TCP
+            volumes:
+                - id: data
+                  dir: /data
+        - name: api
+          icon: https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1735656025985x589899456761148800%2Fevolution-logo.png
+          template: PREBUILT
+          spec:
+            source:
+                image: docker.io/luissantostsx/evolution-api:latest
+            ports:
+                - id: web
+                  port: 8080
+                  type: HTTP
+            volumes:
+                - id: instances
+                  dir: /evolution/instances
+            env:
+                AUTHENTICATION_API_KEY:
+                    default: O27MN9l3eDivVmCgTedbxXCpKMJgq8x3dRnr1bTYX3g=
+                    expose: false
+                AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES:
+                    default: "true"
+                CACHE_REDIS_ENABLED:
+                    default: "true"
+                CACHE_REDIS_PREFIX_KEY:
+                    default: evolution
+                CACHE_REDIS_TTL:
+                    default: "604800"
+                CACHE_REDIS_URI:
+                    default: redis://redis:6379/6
+                CONFIG_SESSION_PHONE_CLIENT:
+                    default: Evolution API
+                CONFIG_SESSION_PHONE_NAME:
+                    default: Chrome
+                CONFIG_SESSION_PHONE_VERSION:
+                    default: 2.3000.1026080446
+                CORS_ORIGIN:
+                    default: '*'
+                DATABASE_CONNECTION_CLIENT_NAME:
+                    default: evolution_exchange
+                DATABASE_CONNECTION_URI:
+                    default: postgresql://user:${PASSWORD}@postgres:5432/evolution?schema=public
+                    expose: false
+                DATABASE_PROVIDER:
+                    default: postgresql
+                DATABASE_SAVE_DATA_CHATS:
+                    default: "true"
+                DATABASE_SAVE_DATA_CONTACTS:
+                    default: "true"
+                DATABASE_SAVE_DATA_INSTANCE:
+                    default: "true"
+                DATABASE_SAVE_DATA_NEW_MESSAGE:
+                    default: "true"
+                DATABASE_SAVE_MESSAGE_UPDATE:
+                    default: "true"
+                DEL_INSTANCE:
+                    default: "false"
+                EVENT_EMITTER_MAX_LISTENERS:
+                    default: "50"
+                LANGUAGE:
+                    default: en
+                LOG_BAILEYS:
+                    default: error
+                LOG_COLOR:
+                    default: "true"
+                LOG_LEVEL:
+                    default: ERROR,WARN,DEBUG,INFO,LOG,VERBOSE,DARK,WEBHOOKS,WEBSOCKET
+                QRCODE_COLOR:
+                    default: '#175197'
+                QRCODE_LIMIT:
+                    default: "30"
+                SERVER_PORT:
+                    default: "8080"
+                SERVER_TYPE:
+                    default: http
+                SERVER_URL:
+                    default: https://${ZEABUR_WEB_DOMAIN}
