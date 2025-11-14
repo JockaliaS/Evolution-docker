@@ -1,0 +1,50 @@
+Evolution API Setup Package
+============================
+
+Version: v2.3.6
+Date: November 14, 2025
+Image Source: evoapicloud/evolution-api:v2.3.6
+
+Components:
+- Evolution API: v2.3.6
+- PostgreSQL: 15-alpine
+- Redis: 7-alpine
+- Docker Compose: 3.8
+
+Configuration:
+- All services with health checks
+- Persistence volumes configured
+- Network isolation enabled
+- Production-ready settings
+
+Files included:
+1. docker-compose.yml - Main configuration with API, PostgreSQL, Redis
+2. .env - Environment variables (customize with your values)
+3. .env-example - Example configuration
+4. README.md - Quick start guide
+5. docker-compose-override.yml - Development overrides
+6. health-check.sh - Service verification script
+7. Makefile - Convenient commands
+8. .gitignore - Git exclusions
+9. .dockerignore - Docker build exclusions
+10. VERSION.txt - This file
+
+Features:
+- Health checks for all services
+- Network isolation with Docker networks
+- Volume persistence for data
+- Environment variable management
+- Production-ready configuration
+- Easy-to-use Makefile commands
+- Development overrides included
+
+Quick Start:
+1. Edit .env with your configuration
+2. Run: docker compose up -d
+3. Access API at: http://localhost:8080
+
+Documentation:
+- Evolution API: https://doc.evolution-api.com
+- Docker Compose: https://docs.docker.com/compose
+- PostgreSQL: https://www.postgresql.org/docs
+- Redis: https://redis.io/documentation
