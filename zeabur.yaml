@@ -4,55 +4,31 @@ kind: Template
 metadata:
     name: evolution-api
 spec:
-    description: Evolution API is a powerful WhatsApp API that allows you to connect and manage your WhatsApp accounts programmatically.
+    description: Evolution API is a powerful WhatsApp API with PostgreSQL and Redis
     icon: https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1735656025985x589899456761148800%2Fevolution-logo.png
     tags:
         - API
         - WhatsApp
         - Communication
     readme: |
-        # Evolution API
+        # Evolution API - Full Stack
 
-        This template deploys Evolution API, a powerful WhatsApp API that allows you to connect and manage your WhatsApp accounts programmatically.
+        One-click deployment with PostgreSQL, Redis, and Evolution API.
 
         ## Components
+        - Evolution API v2.2.3
+        - PostgreSQL 15
+        - Redis latest
 
-        - **Evolution API**: The main API service
-        - **PostgreSQL**: Database for storing messages and instance data
-        - **Redis**: Cache server for improved performance
-
-        ## Configuration
-
-        ### Environment Variables
-
-        Key environment variables:
-
-        - **SERVER_URL**: The public URL of your application (automatically set to your Zeabur domain)
-        - **AUTHENTICATION_API_KEY**: API key for accessing the Evolution API (automatically generated)
-        - **DATABASE_CONNECTION_URI**: Database connection string (automatically configured)
-
-        ### Getting Started
-
-        1. After deployment, access your Evolution API at the provided URL
-        2. Use the generated API key for authentication
-        3. Create instances and connect them to WhatsApp using the API
-
-        ### API Documentation
-
-        For detailed API documentation, visit [Evolution API Documentation](https://doc.evolution-api.com)
-
-        ## Security Notes
-
-        - Keep your API key secure
-        - Configure webhooks for receiving real-time updates
-        - Set appropriate permissions for your instances
+        ## After Deployment
+        Access your API at the provided domain.
     services:
         - name: postgres
           icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
           template: PREBUILT
           spec:
             source:
-                image: postgres:15
+                image: postgres:15-alpine
             ports:
                 - id: postgres
                   port: 5432
@@ -66,15 +42,18 @@ spec:
                 POSTGRES_HOST_AUTH_METHOD:
                     default: trust
                 POSTGRES_PASSWORD:
-                    default: ${PASSWORD}
+                    default: F1zqI48K72Epd56hT93neluvVti0ALMo
                 POSTGRES_USER:
                     default: user
+                POSTGRES_INITDB_ARGS:
+                    default: -c timezone=UTC
+
         - name: redis
           icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/redis.svg
           template: PREBUILT
           spec:
             source:
-                image: redis:latest
+                image: redis:7-alpine
             ports:
                 - id: redis
                   port: 6379
@@ -82,12 +61,16 @@ spec:
             volumes:
                 - id: data
                   dir: /data
+            env:
+                REDIS_APPENDONLY:
+                    default: "yes"
+
         - name: api
           icon: https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1735656025985x589899456761148800%2Fevolution-logo.png
           template: PREBUILT
           spec:
             source:
-                image: docker.io/luissantostsx/evolution-api:latest
+                image: docker.io/atendai/evolution-api:v2.2.3
             ports:
                 - id: web
                   port: 8080
@@ -95,6 +78,8 @@ spec:
             volumes:
                 - id: instances
                   dir: /evolution/instances
+                - id: store
+                  dir: /evolution/store
             env:
                 AUTHENTICATION_API_KEY:
                     default: O27MN9l3eDivVmCgTedbxXCpKMJgq8x3dRnr1bTYX3g=
@@ -120,8 +105,10 @@ spec:
                 DATABASE_CONNECTION_CLIENT_NAME:
                     default: evolution_exchange
                 DATABASE_CONNECTION_URI:
-                    default: postgresql://user:${PASSWORD}@postgres:5432/evolution?schema=public
+                    default: postgresql://user:F1zqI48K72Epd56hT93neluvVti0ALMo@postgres:5432/evolution?schema=public
                     expose: false
+                DATABASE_ENABLED:
+                    default: "true"
                 DATABASE_PROVIDER:
                     default: postgresql
                 DATABASE_SAVE_DATA_CHATS:
